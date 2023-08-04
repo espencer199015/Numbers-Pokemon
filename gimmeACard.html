@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Cards!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<button>GIMME A CARD!</button>
+<div id="card-area"></div>
+<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+<script src="app.js"></script>
+<script>
+    // Function to fetch a single card from the deck
+    function fetchSingleCardFromDeck(deckId) {
+      return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`)
+        .then(response => response.json())
+        .then(data => data.cards[0])
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Function to create a new deck
+    function createNewDeck() {
+      return fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+        .then(response => response.json())
+        .then(data => data.deck_id)
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Function to display a card on the page
+    function displayCard(value, suit) {
+      const cardDisplay = document.getElementById('card-display');
+      const cardElement = document.createElement('div');
+      cardElement.textContent = `${value} of ${suit}`;
+      cardDisplay.appendChild(cardElement);
+    }
+
+    // Function to draw a card and display it on the page
+    function drawCard() {
+      fetchSingleCardFromDeck(deckId)
+        .then(card => {
+          if (card) {
+            displayCard(card.value, card.suit);
+          } else {
+            alert('No more cards left in the deck.');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    let deckId;
+
+    // When the page loads, create a new deck
+    createNewDeck()
+      .then(newDeckId => {
+        deckId = newDeckId;
+        const drawCardButton = document.getElementById('draw-card-btn');
+        drawCardButton.addEventListener('click', drawCard);
+      })
+      .catch(error => console.error('Error:', error));
+  </script>
+</body>
+</html>
